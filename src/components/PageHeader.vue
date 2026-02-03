@@ -11,26 +11,14 @@
       </div>
 
       <nav class="page-header__nav">
-        <button type="button" class="page-header__nav-item" 
-        :class="{ 'page-header__nav-item--active': activeTab === 'home' }"
-        v-on:click="setTab('home')"
+        <RouterLink 
+        v-for="tab in tabs" 
+        :key="tab.path" 
+        class="page-header__nav-item"
+        :to="{ path: tab.path, query: tab.query}"
         >
-        Главная
-      </button>
-
-        <button type="button" class="page-header__nav-item"
-        :class="{ 'page-header__nav-item--active': activeTab === 'rules' }"
-        @click="setTab('rules')"
-        >
-        Правила
-      </button>
-
-        <button type="button" class="page-header__nav-item"
-        :class="{ 'page-header__nav-item--active': activeTab === 'contacts' }"
-        @click="setTab('contacts')"
-        >
-        Контакты
-      </button>
+      {{ tab.title }}
+      </RouterLink>
       </nav>
     </div>
   </header>
@@ -43,18 +31,29 @@
     components: {
       SvgLogo,
     },
-     emits: ["setTab"],
-    props: {
-      activeTab: {
-        type: String,
-        default: "",
-      },
-    },
-    methods: {
-      setTab(value) {
-        this.$emit("setTab", value);
-      },
-    },
+    data() {
+      return {
+        tabs: [
+          {
+            title: "Главная",
+            path: "/"
+          },
+          {
+            title: "Правила",
+            path: "/rules"
+          },
+          {
+            title: "Контакты",
+            path: "/contacts",
+            query: {
+              address: "г. Томск, ул. Красноармейская, 146",
+              email: "idat@tusur.ru",
+              phone: "(3822) 90-72-56"
+            }
+          },
+        ]
+      }
+    }
   };
 </script>
 

@@ -5,9 +5,10 @@
       <div class="list-articles__list">
         <CardArticle 
         v-for="item in newsList"
-        v-bind:key="item.id"
+        :key="item.id"
+        :id="item.id"
         :title="item.title"
-        :description="item.description"
+        :description="item.body"
         class="list-articles__card" />
         
       </div>
@@ -17,7 +18,6 @@
 
 <script>
   import CardArticle from "@/components/card/CardArticle.vue";
-  import newsList from "@/json/news.json";
 
   export default {
     components: {
@@ -25,9 +25,21 @@
     },
     data() {
       return {
-        newsList: newsList,
+        newsList: [],
       };
     },
+    methods: {
+      getNewsList() {
+        this.$axios("https://dummyjson.com/posts").then((response) => {
+          if (response?.data?.posts) {
+            this.newsList = response.data.posts;
+          }
+        });
+      }
+    },
+    created () {
+      this.getNewsList();
+    }
   };
 </script>
 
