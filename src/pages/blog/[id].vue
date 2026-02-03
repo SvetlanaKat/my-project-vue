@@ -5,7 +5,7 @@
         {{ listItem.title }}
       </h2>
       <div class="blog-article__autor">
-        {{ listItem.autor }}
+        {{ listItem.author }}
       </div>
       <div class="blog-article__sections">
         <div 
@@ -24,21 +24,37 @@
 </template>
 
 <script>
-import newsList from "@/json/news.json";
+
 
 export default {
   data() {
     return {
-      newsList: newsList
+      listItem: {},
     };
   },
   computed: {
-    listItem() {
-      return (
-        this.newsList.find((item) => this.$route.params.id == item.id) || {}
-      );
-    },
+    id() {
+      return this.$route.params.id
+    }
   },
+  methods: {
+    getPost() {
+      if (!this.id) return;
+      this.$axios(`https://dummyjson.com/posts/${this.id}`).then((response) => {
+        if (response?.data) {
+          this.listItem = {
+            title: response.data.title,
+            description: response.data.body,
+            author: response.data.userId,
+            tags: Array.isArray(response.data.tags) ? response.data.tags : []
+          }
+        }
+      });
+    }
+  },
+  created() {
+    this.getPost();
+  }
 };
 </script>
 
