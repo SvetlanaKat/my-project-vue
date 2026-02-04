@@ -9,32 +9,54 @@
         :id="item.id"
         :title="item.title"
         :description="item.body"
-        class="list-articles__card" />
-        
+        class="list-articles__card" 
+        />
       </div>
+      <ThePaginator 
+      :page="page"
+      :totalPages="totalPages"
+      @setPage="setPages"
+      class="list-articles__paginator" />
     </div>
   </main>
 </template>
 
 <script>
   import CardArticle from "@/components/card/CardArticle.vue";
+import ThePaginator from "@/components/ThePaginator.vue";
 
   export default {
     components: {
       CardArticle,
+      ThePaginator
     },
     data() {
       return {
         newsList: [],
+        limit: 10,
+        page: 1,
+        totalCount: 1,
+        totalPages: 1
       };
     },
     methods: {
-      getNewsList() {
-        this.$axios("https://dummyjson.com/posts").then((response) => {
+      getNewsList(page = 1) {
+        this.$axios("https://dummyjson.com/posts", {
+          params: {
+            limit: this.limit,
+            skip: this.limit * (page -1)
+          }
+        }).then((response) => {
           if (response?.data?.posts) {
             this.newsList = response.data.posts;
+            this.page = page;
+            this.totalCount = response.data.total;
+            this.totalPages = Math.ceil(this.totalCount/this.limit);
           }
         });
+      },
+      setPages(page) {
+        this.getNewsList(page)
       }
     },
     created () {
@@ -54,6 +76,4 @@
       margin-bottom: 15px;
     }
   }
-
-  
 </style>
