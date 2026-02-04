@@ -2,6 +2,7 @@
  
   <main class="list-articles">
     <div class="list-articles__container">
+      <SearchForm class="list-articles__search-form" @search="onSearch"/>
       <div class="list-articles__list">
         <CardArticle 
         v-for="item in newsList"
@@ -23,12 +24,14 @@
 
 <script>
   import CardArticle from "@/components/card/CardArticle.vue";
-import ThePaginator from "@/components/ThePaginator.vue";
+  import ThePaginator from "@/components/ThePaginator.vue";
+  import SearchForm from "@/components/SearchForm.vue";
 
   export default {
     components: {
       CardArticle,
-      ThePaginator
+      ThePaginator,
+      SearchForm
     },
     data() {
       return {
@@ -36,16 +39,27 @@ import ThePaginator from "@/components/ThePaginator.vue";
         limit: 10,
         page: 1,
         totalCount: 1,
-        totalPages: 1
+        totalPages: 1,
+        search: ""
       };
     },
     methods: {
       getNewsList(page = 1) {
-        this.$axios("https://dummyjson.com/posts", {
-          params: {
-            limit: this.limit,
-            skip: this.limit * (page -1)
-          }
+        const params = {
+          limit: this.limit,
+          skip: this.limit * (page - 1),
+        };
+
+
+        if (this.search) params.q = this.search;
+
+        const url = this.search 
+        ? "https://dummyjson.com/posts/search" 
+        : "https://dummyjson.com/posts";
+
+
+        this.$axios(url, {
+          params: params,
         }).then((response) => {
           if (response?.data?.posts) {
             this.newsList = response.data.posts;
@@ -57,9 +71,18 @@ import ThePaginator from "@/components/ThePaginator.vue";
       },
       setPages(page) {
         this.getNewsList(page)
+      },
+      onSearch(search) {
+        this.$router
+        .push({query: search ? {search: search} : {}})
+        .then(() => {
+          this.search = this.$route.query.search;
+          this.getNewsList();
+        })
       }
     },
     created () {
+      if (this.$route.query.search) this.search = this.$route.query.search;
       this.getNewsList();
     }
   };
@@ -72,6 +95,9 @@ import ThePaginator from "@/components/ThePaginator.vue";
     &__container {
       .container();
     }
+ &__search-form {
+    margin-bottom: 30px;
+  }
     &__card {
       margin-bottom: 15px;
     }
